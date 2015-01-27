@@ -19,7 +19,7 @@ public class CheckersBoardPanel extends JPanel {
     private final char abc[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
     private final char abc_l[] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
     public boolean move = false;
-    public int x_move; 
+    public int x_move;
     public int y_move;
     int now_hodit;
     public int i_where, j_where;
@@ -39,10 +39,10 @@ public class CheckersBoardPanel extends JPanel {
     public int[][] board = new int[BOARD_SIZE][BOARD_SIZE];
     public boolean mustEat = false;
     public String mustEatString = "";
-    
+
     public CheckersBoardPanel() {
         super();
-        
+
         this.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent e) {
                 moveStop();
@@ -67,7 +67,7 @@ public class CheckersBoardPanel extends JPanel {
                 repaint();
             }
         });
-        
+
         bufferImage = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
         buffer_g = (Graphics2D) bufferImage.getGraphics();
         initBoard();
@@ -83,7 +83,7 @@ public class CheckersBoardPanel extends JPanel {
         drawMove(buffer_g);
         g.drawImage(bufferImage, 0, 0, null);
     }
-    
+
     public void resizePanel() {
         int h = this.getHeight();
         int w = this.getWidth();
@@ -295,8 +295,8 @@ public class CheckersBoardPanel extends JPanel {
         }
         if (i >= 0 && j >= 0) {
             this_h = board[j][i];
-            if ((nowMove == WHITE && (this_h == 1 || this_h == 2)) || 
-                    (nowMove == BLACK && (this_h == 3 || this_h == 4))) {
+            if ((nowMove == WHITE && (this_h == 1 || this_h == 2))
+                    || (nowMove == BLACK && (this_h == 3 || this_h == 4))) {
                 move = true;
                 i_where = i;
                 j_where = j;
@@ -412,7 +412,7 @@ public class CheckersBoardPanel extends JPanel {
             newline = false;
         } else {
             NetCheckers.getInstance().listModel.setElementAt(
-                    NetCheckers.getInstance().listModel.lastElement() + "   " + s,
+                    NetCheckers.getInstance().listModel.lastElement() + "                 " + s,
                     NetCheckers.getInstance().listModel.getSize() - 1);
             newline = true;
         }

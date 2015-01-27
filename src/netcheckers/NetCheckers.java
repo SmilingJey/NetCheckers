@@ -21,6 +21,7 @@ public class NetCheckers extends javax.swing.JFrame {
         NetCheckers.getInstance();
         Configframe.getInstance().loadConfig();
         NetCheckers.getInstance().setVisible(true);
+        NetCheckers.getInstance().checkersBoardPanel.repaint();
     }
 
     private static NetCheckers instance;
@@ -32,6 +33,7 @@ public class NetCheckers extends javax.swing.JFrame {
     public boolean timerBlackPause = true;
     public boolean connect = false;
     public CheckersBoardPanel checkersBoardPanel;
+    public ServerListiner serverListener;
     public ServerConnect serverConnect;
     public String game_type = "";
     public DefaultListModel listModel = new DefaultListModel();
@@ -61,6 +63,9 @@ public class NetCheckers extends javax.swing.JFrame {
         checkersBoardPanel = new CheckersBoardPanel();
         checkersBoardPanel.setSize(jPanelBoard.getWidth(), jPanelBoard.getHeight());
         jPanelBoard.add(checkersBoardPanel, BorderLayout.CENTER);
+
+        setBackgroundColor(Configframe.getInstance().getColorBoardWhite());
+        
         checkersBoardPanel.resizePanel();
         checkersBoardPanel.repaint();
         setBackgroundColor(Configframe.getInstance().getColorBoardWhite());
@@ -69,8 +74,8 @@ public class NetCheckers extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent evt) {
                 if (!timerWhitePause) {
                     timerWhiteTime++;
-                    jLabelWhiteTime.setText("WHITE: " + String.format("%01d:%02d:%02d",
-                            (timerWhiteTime / (60 * 60)) % 24, (timerWhiteTime / (60)) % 60, (timerWhiteTime) % 60));
+                    jLabelWhiteTime.setText(" WHITE: " + String.format("%01d:%02d",
+                                                (timerWhiteTime / (60)) % 60, (timerWhiteTime) % 60));
 
                 }
             }
@@ -82,14 +87,16 @@ public class NetCheckers extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent evt) {
                 if (!timerBlackPause) {
                     timerBlackTime++;
-                    jLabelBlackTime.setText("BLACK: " + String.format("%01d:%02d:%02d",
-                            (timerWhiteTime / (60 * 60)) % 24, (timerWhiteTime / (60)) % 60, (timerWhiteTime) % 60));
+                    jLabelBlackTime.setText(" BLACK: " + String.format("%01d:%02d",
+                                                (timerWhiteTime / (60)) % 60, (timerWhiteTime) % 60));
 
                 }
             }
         });
         timerBlack.setRepeats(true);
         timerBlack.start();
+        
+        
     }
 
     /**
@@ -106,7 +113,7 @@ public class NetCheckers extends javax.swing.JFrame {
         jPanelBoard = new javax.swing.JPanel();
         jPanelLog = new javax.swing.JPanel();
         jButtonSendMessage = new javax.swing.JButton();
-        jTextFieldMassage = new javax.swing.JTextField();
+        jTextFieldMessage = new javax.swing.JTextField();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextAreaLog = new javax.swing.JTextArea();
         jLabel6 = new javax.swing.JLabel();
@@ -159,9 +166,9 @@ public class NetCheckers extends javax.swing.JFrame {
         jPanelLog.add(jButtonSendMessage);
         jButtonSendMessage.setBounds(540, 80, 70, 20);
 
-        jTextFieldMassage.setEnabled(false);
-        jPanelLog.add(jTextFieldMassage);
-        jTextFieldMassage.setBounds(70, 80, 460, 20);
+        jTextFieldMessage.setEnabled(false);
+        jPanelLog.add(jTextFieldMessage);
+        jTextFieldMessage.setBounds(70, 80, 460, 20);
 
         jTextAreaLog.setEditable(false);
         jTextAreaLog.setColumns(20);
@@ -215,14 +222,14 @@ public class NetCheckers extends javax.swing.JFrame {
         jLabel1.setBounds(2, 0, 170, 30);
 
         jLabelWhiteTime.setBackground(new java.awt.Color(204, 153, 0));
-        jLabelWhiteTime.setText("WHITE: 0:00");
+        jLabelWhiteTime.setText(" WHITE: 0:00");
         jLabelWhiteTime.setOpaque(true);
         jPanelMenu.add(jLabelWhiteTime);
         jLabelWhiteTime.setBounds(2, 30, 87, 20);
         jLabelWhiteTime.getAccessibleContext().setAccessibleDescription("");
 
         jLabelBlackTime.setBackground(new java.awt.Color(204, 153, 0));
-        jLabelBlackTime.setText("BLACK: 0:00");
+        jLabelBlackTime.setText(" BLACK: 0:00");
         jLabelBlackTime.setOpaque(true);
         jPanelMenu.add(jLabelBlackTime);
         jLabelBlackTime.setBounds(90, 30, 90, 20);
@@ -360,9 +367,9 @@ public class NetCheckers extends javax.swing.JFrame {
     }//GEN-LAST:event_jButtonColorsSettingsActionPerformed
 
     private void jButtonSendMessageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSendMessageActionPerformed
-        if (!jTextFieldMassage.getText().isEmpty()) {
-            serverConnect.sendMessage("mess " + jTextFieldMassage.getText());
-            addToLog(" I>>> " + jTextFieldMassage.getText());
+        if (!jTextFieldMessage.getText().isEmpty()) {
+            serverConnect.sendMessage("mess " + jTextFieldMessage.getText());
+            addToLog(" I>>> " + jTextFieldMessage.getText());
         }
     }//GEN-LAST:event_jButtonSendMessageActionPerformed
 
@@ -422,13 +429,14 @@ public class NetCheckers extends javax.swing.JFrame {
     public javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTextAreaLog;
     private javax.swing.JTextField jTextFieldIP;
-    private javax.swing.JTextField jTextFieldMassage;
+    private javax.swing.JTextField jTextFieldMessage;
     private javax.swing.JTextField jTextFieldPort;
     // End of variables declaration//GEN-END:variables
 
     public void connect() {
         if (isServer()) {
-            ServerListiner.getInstance().start();
+            serverListener = new ServerListiner();
+            serverListener.start();
             addToLog(" SYSTEM>>>Wait client connected ... ");
         } else {
             String ip = getIP();
@@ -444,10 +452,12 @@ public class NetCheckers extends javax.swing.JFrame {
                 addToLog(" SYSTEM>>>Unknow host");
                 setConnectButtonText(jRadioButtonServer.isSelected(),false);
                 setEnableConnection(false);
+                e.printStackTrace();
             } catch (IOException e) {
                 addToLog(" SYSTEM>>>IO Connect error");
                 setConnectButtonText(jRadioButtonServer.isSelected(),false);
                 setEnableConnection(false);
+                e.printStackTrace();
             }
         }
     }
@@ -467,8 +477,8 @@ public class NetCheckers extends javax.swing.JFrame {
             jLabel1.setText("You play WHITE");
             checkersBoardPanel.nowMove = CheckersBoardPanel.WHITE;
         }
-        jLabelWhiteTime.setText(" WHITE: 0:00:00");
-        jLabelBlackTime.setText(" BLACK: 0:00:00");
+        jLabelWhiteTime.setText(" WHITE: 0:00");
+        jLabelBlackTime.setText(" BLACK: 0:00");
         timerWhitePause = true;
         timerBlackPause = true;
         timerBlackTime = 0;
@@ -492,7 +502,8 @@ public class NetCheckers extends javax.swing.JFrame {
         connect = false;
         try {
             checkersBoardPanel.game_start = false;
-            serverConnect.closeServerConnection();
+            if (serverConnect!=null || connect) serverConnect.closeServerConnection();
+            if (serverListener!=null) serverListener.closeServerListener();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -500,20 +511,20 @@ public class NetCheckers extends javax.swing.JFrame {
     
     public void addToLog(String s) {
         jTextAreaLog.setText(jTextAreaLog.getText() + s + '\n');
-        jTextFieldMassage.setText("");
+        jTextFieldMessage.setText("");
         jScrollPane2.getVerticalScrollBar().setValue(jScrollPane2.getVerticalScrollBar().getMaximum());
     }
 
     public void setEnableConnection(boolean b) {
         jButtonSendMessage.setEnabled(b);
-        jTextFieldMassage.setEnabled(b);
+        jTextFieldMessage.setEnabled(b);
     }
 
     public void setEnableServer(boolean b) {
         jComboBoxSideSelect.setEnabled(b);
         jButtonNewGame.setEnabled(b);
         jButtonSendMessage.setEnabled(b);
-        jTextFieldMassage.setEnabled(b);
+        jTextFieldMessage.setEnabled(b);
     }
 
     public void setBackgroundColor(Color c) {
@@ -524,16 +535,19 @@ public class NetCheckers extends javax.swing.JFrame {
         jRadioButtonClient.setBackground(c);
         jLabelWhiteTime.setBackground(c);
         jLabelBlackTime.setBackground(c);
+        jTextAreaLog.setBackground(c);
+        jTextFieldMessage.setBackground(c);
+        jListMove.setBackground(c);
     }
 
     public void setWhiteMove(boolean whiteMove) {
         if (whiteMove) {
             jLabelBlackTime.setBackground(Configframe.getInstance().getColorBoardWhite());
-            jLabelWhiteTime.setBackground(new Color(255, 0, 0));
+            if (checkersBoardPanel.myColor == CheckersBoardPanel.WHITE) jLabelWhiteTime.setBackground(new Color(255, 0, 0));
             timerWhitePause = false;
             timerBlackPause = true;
         } else {
-            jLabelBlackTime.setBackground(new Color(255, 0, 0));
+            if (checkersBoardPanel.myColor == CheckersBoardPanel.BLACK) jLabelBlackTime.setBackground(new Color(255, 0, 0));
             jLabelWhiteTime.setBackground(Configframe.getInstance().getColorBoardWhite());
             timerWhitePause = true;
             timerBlackPause = false;
@@ -646,8 +660,8 @@ public class NetCheckers extends javax.swing.JFrame {
                 }
             }
             addToLog(" SYSTEM>>>New game started, " + jLabel1.getText());
-            jLabelWhiteTime.setText(" WHITE: 0:00:00");
-            jLabelBlackTime.setText(" BLACK: 0:00:00");
+            jLabelWhiteTime.setText(" WHITE: 0:00");
+            jLabelBlackTime.setText(" BLACK: 0:00");
             setWhiteMove(checkersBoardPanel.nowMove == CheckersBoardPanel.WHITE);
             listModel.clear();
             checkersBoardPanel.game_start = true;

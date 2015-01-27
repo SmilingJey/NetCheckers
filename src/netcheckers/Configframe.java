@@ -15,10 +15,10 @@ import javax.swing.JColorChooser;
 public class Configframe extends javax.swing.JFrame {
 
     private static Configframe instance;
-    private Color colorBoardBlack = new Color(-7183360);
-    private Color colorBoardWhite = new Color(-2710016);
-    private Color colorCheckersBlack = new Color(0);
-    private Color colorChekersWhite = new Color(255, 255, 255);
+    private Color colorBoardBlack;
+    private Color colorBoardWhite;
+    private Color colorCheckersBlack;
+    private Color colorChekersWhite;
     
     private Configframe() {
         initComponents();
@@ -26,6 +26,14 @@ public class Configframe extends javax.swing.JFrame {
         Dimension frameSize = this.getSize();
         this.setLocation((screenSize.width - frameSize.width) / 2,(screenSize.height - frameSize.height) / 2);
         this.setSize(230, 240);
+        colorBoardBlack = new Color(50, 50, 50);
+        colorBoardWhite = new Color(214, 214, 214);
+        colorCheckersBlack = new Color(0);
+        colorChekersWhite = new Color(255, 255, 255);
+        jPanelBoardBlack.setBackground(colorBoardBlack);
+        jPanelBoardWhite.setBackground(colorBoardWhite);
+        jPanelCheckersBlack.setBackground(colorCheckersBlack);
+        jPanelCheckersWhite.setBackground(colorChekersWhite);
     }
 
     /**
