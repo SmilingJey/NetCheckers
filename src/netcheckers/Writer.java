@@ -1,39 +1,45 @@
 package netcheckers;
 
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 
 public class Writer extends Thread {
 
-    PrintWriter out;
-    ServerConnect server;
-    public String mess = "";
-    public boolean stop = false;
+    private final PrintWriter out;
+    private String message = "";
+    private boolean stop = false;
 
-    public Writer(ServerConnect server) {
+    public Writer(PrintWriter out) {
         super();
-        this.server = server;
+        this.out = out;
+    }
+
+    public synchronized void sendMessage(String message) {
+        this.message = message;
+        notify();
+    }
+
+    public synchronized void closeWriter() {
+        stop = true;
+        notify();
     }
 
     public void run() {
         try {
-            out = new PrintWriter(new OutputStreamWriter(server.client.getOutputStream()), true);
             while (!stop) {
                 synchronized (this) {
                     wait();
                 }
-                System.out.print("write " + mess);
-                out.write(mess);
-                out.flush();
+                if (!stop) {
+                    System.out.print("write " + message);
+                    out.write(message);
+                    out.flush();
+                }
             }
             out.close();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally{
             out.close();
         }
-    }
-
-    synchronized void notify_this() {
-        notify();
     }
 }

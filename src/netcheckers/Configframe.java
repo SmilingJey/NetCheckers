@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +14,12 @@ import javax.swing.JColorChooser;
 
 public class Configframe extends javax.swing.JFrame {
 
+    private static Configframe instance;
+    private Color colorBoardBlack = new Color(-7183360);
+    private Color colorBoardWhite = new Color(-2710016);
+    private Color colorCheckersBlack = new Color(0);
+    private Color colorChekersWhite = new Color(255, 255, 255);
+    
     private Configframe() {
         initComponents();
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -187,26 +192,26 @@ public class Configframe extends javax.swing.JFrame {
     private void jPanelBoardBlackMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanelBoardBlackMouseClicked
         colorBoardBlack = JColorChooser.showDialog(this, "Select color for board black", colorBoardBlack);
         jPanelBoardBlack.setBackground(colorBoardBlack);
-        NetCheckers.getInstance().pole_panel.repaint();
+        NetCheckers.getInstance().checkersBoardPanel.repaint();
     }//GEN-LAST:event_jPanelBoardBlackMouseClicked
 
     private void jPanelBoardWhiteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanelBoardWhiteMouseClicked
         colorBoardWhite = JColorChooser.showDialog(this, "Select color for board white", colorBoardWhite);
         jPanelBoardWhite.setBackground(colorBoardWhite);
         NetCheckers.getInstance().setBackgroundColor(colorBoardWhite);
-        NetCheckers.getInstance().pole_panel.repaint();
+        NetCheckers.getInstance().checkersBoardPanel.repaint();
     }//GEN-LAST:event_jPanelBoardWhiteMouseClicked
 
     private void jPanelCheckersBlackMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanelCheckersBlackMouseClicked
         colorCheckersBlack = JColorChooser.showDialog(this, "Select color for checkers black", colorCheckersBlack);
         jPanelCheckersBlack.setBackground(colorCheckersBlack);
-        NetCheckers.getInstance().pole_panel.repaint();
+        NetCheckers.getInstance().checkersBoardPanel.repaint();
     }//GEN-LAST:event_jPanelCheckersBlackMouseClicked
 
     private void jPanelCheckersWhiteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanelCheckersWhiteMouseClicked
         colorChekersWhite = JColorChooser.showDialog(this, "Select color for checkers white", colorChekersWhite);
         jPanelCheckersWhite.setBackground(colorChekersWhite);
-        NetCheckers.getInstance().pole_panel.repaint();
+        NetCheckers.getInstance().checkersBoardPanel.repaint();
     }//GEN-LAST:event_jPanelCheckersWhiteMouseClicked
 
     private void jButtonResetColorsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonResetColorsActionPerformed
@@ -219,7 +224,7 @@ public class Configframe extends javax.swing.JFrame {
         jPanelCheckersBlack.setBackground(colorCheckersBlack);
         jPanelCheckersWhite.setBackground(colorChekersWhite);
         NetCheckers.getInstance().setBackgroundColor(colorBoardWhite);
-        NetCheckers.getInstance().pole_panel.repaint();
+        NetCheckers.getInstance().checkersBoardPanel.repaint();
     }//GEN-LAST:event_jButtonResetColorsActionPerformed
 
     private void jButtonSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSaveActionPerformed
@@ -230,7 +235,7 @@ public class Configframe extends javax.swing.JFrame {
     private void jButtonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCancelActionPerformed
         loadConfig();
         setVisible(false);
-        NetCheckers.getInstance().pole_panel.repaint();
+        NetCheckers.getInstance().checkersBoardPanel.repaint();
     }//GEN-LAST:event_jButtonCancelActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -247,12 +252,6 @@ public class Configframe extends javax.swing.JFrame {
     private javax.swing.JPanel jPanelCheckersBlack;
     private javax.swing.JPanel jPanelCheckersWhite;
     // End of variables declaration//GEN-END:variables
-
-    private static Configframe instance;
-    private Color colorBoardBlack = new Color(-7183360);
-    private Color colorBoardWhite = new Color(-2710016);
-    private Color colorCheckersBlack = new Color(0);
-    private Color colorChekersWhite = new Color(255, 255, 255);
 
     public Color getColorBoardBlack() {
         return colorBoardBlack;
@@ -287,7 +286,6 @@ public class Configframe extends javax.swing.JFrame {
             } else {
                 NetCheckers.getInstance().setServer(false);
             }
-
             NetCheckers.getInstance().setPort(Integer.parseInt(prop.getProperty("port")));
             NetCheckers.getInstance().setIP(prop.getProperty("serverIP"));
             colorBoardBlack = new Color(Integer.parseInt(prop.getProperty("color_board_black")));
@@ -301,7 +299,7 @@ public class Configframe extends javax.swing.JFrame {
             NetCheckers.getInstance().setBackgroundColor(colorBoardWhite);
             propin.close();
         } catch (IOException e) {
-            //e.printStackTrace();
+            e.printStackTrace();
         }
     }
 
@@ -319,7 +317,7 @@ public class Configframe extends javax.swing.JFrame {
             prop.store(propOut, "NetCheckers properties");
             propOut.close();
         } catch (IOException e) {
-            //e.printStackTrace();
+            e.printStackTrace();
         }
     }
 }

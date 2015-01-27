@@ -3,64 +3,39 @@ package netcheckers;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.StringTokenizer;
-import javax.imageio.ImageIO;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.Timer;
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
- * NetCheckers.java
- *
- * Created on 18.04.2009, 8:33:17
- */
-/**
- *
- * @author APTEM
- */
 public class NetCheckers extends javax.swing.JFrame {
 
     public static void main(String[] args) {
         NetCheckers.getInstance();
-        Configframe.getInstance().loadConfig();         
+        Configframe.getInstance().loadConfig();
         NetCheckers.getInstance().setVisible(true);
     }
 
     private static NetCheckers instance;
-
-    private ActionListener taskPerformerTimerWhite;
-    private ActionListener taskPerformerTimerBlack;
     public Timer timerWhite;
     public Timer timerBlack;
     public int timerWhiteTime;
     public int timerBlackTime;
     public boolean timerWhitePause = true;
     public boolean timerBlackPause = true;
-    
-    
     public boolean connect = false;
-    public BoardPanel pole_panel;
-    public ServerListiner sl;
-    public ServerConnect sc;
-
+    public CheckersBoardPanel checkersBoardPanel;
+    public ServerConnect serverConnect;
     public String game_type = "";
     public DefaultListModel listModel = new DefaultListModel();
-    
-    
+
     public static NetCheckers getInstance() {
         if (instance == null) {
             instance = new NetCheckers();
@@ -70,8 +45,6 @@ public class NetCheckers extends javax.swing.JFrame {
 
     private NetCheckers() {
         initComponents();
-        
-        this.setBackground(new Color(204, 153, 0));
         URL url = this.getClass().getResource("icon.png");
         ImageIcon image = new ImageIcon(url);
         setIconImage(image.getImage());
@@ -85,39 +58,36 @@ public class NetCheckers extends javax.swing.JFrame {
         }
         this.setLocation((screenSize.width - frameSize.width) / 2,
                 (screenSize.height - frameSize.height) / 2);
-        pole_panel = getPole_panel();
-        pole_panel.setSize(jPanelBoard.getWidth(), jPanelBoard.getHeight());
-        jPanelBoard.add(pole_panel, BorderLayout.CENTER);
-        pole_panel.resizePanel();
-        pole_panel.repaint();
+        checkersBoardPanel = new CheckersBoardPanel();
+        checkersBoardPanel.setSize(jPanelBoard.getWidth(), jPanelBoard.getHeight());
+        jPanelBoard.add(checkersBoardPanel, BorderLayout.CENTER);
+        checkersBoardPanel.resizePanel();
+        checkersBoardPanel.repaint();
         setBackgroundColor(Configframe.getInstance().getColorBoardWhite());
         jListMove.setModel(listModel);
-        
-        taskPerformerTimerWhite = new ActionListener() {
+        timerWhite = new Timer(1000, new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 if (!timerWhitePause) {
                     timerWhiteTime++;
-                    jLabelWhiteTime.setText("WHITE: " + String.format("%01d:%02d:%02d", 
-                            (timerWhiteTime / (60 * 60)) % 24,(timerWhiteTime / (60)) % 60, (timerWhiteTime) % 60));
-               
+                    jLabelWhiteTime.setText("WHITE: " + String.format("%01d:%02d:%02d",
+                            (timerWhiteTime / (60 * 60)) % 24, (timerWhiteTime / (60)) % 60, (timerWhiteTime) % 60));
+
                 }
             }
-        };
-        timerWhite = new Timer(1000, taskPerformerTimerWhite);
+        });
         timerWhite.setRepeats(true);
         timerWhite.start();
-        
-        taskPerformerTimerBlack = new ActionListener() {
+
+        timerBlack = new Timer(1000, new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 if (!timerBlackPause) {
                     timerBlackTime++;
-                    jLabelBlackTime.setText("BLACK: " + String.format("%01d:%02d:%02d", 
-                            (timerWhiteTime / (60 * 60)) % 24,(timerWhiteTime / (60)) % 60, (timerWhiteTime) % 60));
-               
+                    jLabelBlackTime.setText("BLACK: " + String.format("%01d:%02d:%02d",
+                            (timerWhiteTime / (60 * 60)) % 24, (timerWhiteTime / (60)) % 60, (timerWhiteTime) % 60));
+
                 }
             }
-        };
-        timerBlack = new Timer(1000, taskPerformerTimerBlack);
+        });
         timerBlack.setRepeats(true);
         timerBlack.start();
     }
@@ -187,11 +157,11 @@ public class NetCheckers extends javax.swing.JFrame {
             }
         });
         jPanelLog.add(jButtonSendMessage);
-        jButtonSendMessage.setBounds(540, 70, 70, 20);
+        jButtonSendMessage.setBounds(540, 80, 70, 20);
 
         jTextFieldMassage.setEnabled(false);
         jPanelLog.add(jTextFieldMassage);
-        jTextFieldMassage.setBounds(70, 70, 460, 20);
+        jTextFieldMassage.setBounds(70, 80, 460, 20);
 
         jTextAreaLog.setEditable(false);
         jTextAreaLog.setColumns(20);
@@ -199,11 +169,11 @@ public class NetCheckers extends javax.swing.JFrame {
         jScrollPane2.setViewportView(jTextAreaLog);
 
         jPanelLog.add(jScrollPane2);
-        jScrollPane2.setBounds(70, 6, 540, 60);
+        jScrollPane2.setBounds(70, 5, 540, 70);
 
         jLabel6.setText("Message:");
         jPanelLog.add(jLabel6);
-        jLabel6.setBounds(10, 70, 60, 20);
+        jLabel6.setBounds(10, 80, 60, 20);
 
         jLabel2.setText("Log:");
         jPanelLog.add(jLabel2);
@@ -221,7 +191,7 @@ public class NetCheckers extends javax.swing.JFrame {
             }
         });
         jPanelMenu.add(jCheckBoxRotateBoard);
-        jCheckBoxRotateBoard.setBounds(0, 380, 80, 23);
+        jCheckBoxRotateBoard.setBounds(0, 375, 80, 23);
 
         jButtonColorsSettings.setText("colors");
         jButtonColorsSettings.addActionListener(new java.awt.event.ActionListener() {
@@ -230,7 +200,7 @@ public class NetCheckers extends javax.swing.JFrame {
             }
         });
         jPanelMenu.add(jButtonColorsSettings);
-        jButtonColorsSettings.setBounds(90, 380, 90, 23);
+        jButtonColorsSettings.setBounds(90, 375, 90, 23);
 
         jScrollPane1.setAutoscrolls(true);
 
@@ -352,10 +322,10 @@ public class NetCheckers extends javax.swing.JFrame {
             jPanelContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelContentLayout.createSequentialGroup()
                 .addGroup(jPanelContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanelMenu, javax.swing.GroupLayout.DEFAULT_SIZE, 408, Short.MAX_VALUE)
-                    .addComponent(jPanelBoard, javax.swing.GroupLayout.DEFAULT_SIZE, 408, Short.MAX_VALUE))
+                    .addComponent(jPanelMenu, javax.swing.GroupLayout.DEFAULT_SIZE, 402, Short.MAX_VALUE)
+                    .addComponent(jPanelBoard, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanelLog, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jPanelLog, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -373,65 +343,17 @@ public class NetCheckers extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jCheckBoxRotateBoardItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jCheckBoxRotateBoardItemStateChanged
-        pole_panel.rotate = jCheckBoxRotateBoard.isSelected();
-        pole_panel.repaint();
+        checkersBoardPanel.rotate = jCheckBoxRotateBoard.isSelected();
+        checkersBoardPanel.repaint();
     }//GEN-LAST:event_jCheckBoxRotateBoardItemStateChanged
 
     private void jButtonConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonConnectActionPerformed
         if (jButtonConnect.getText().equals("Start server") || jButtonConnect.getText().equals("Connect to server")) {
-            new_game_conn();
+            connect();
         } else {
-            game_disconnect();
+            disconnect();
         }
     }//GEN-LAST:event_jButtonConnectActionPerformed
-
-    public void new_game_conn() {
-        if (isServer()) {
-            sl = new ServerListiner();
-            sl.start();
-            addtolog(" SYSTEM>>>Wait client connected ... ");
-        } else {
-            String ip = getIP();
-            int port = getPort();
-            addtolog(" SYSTEM>>>Connect to " + ip);
-            try {
-                Socket socket = new Socket(ip, port);
-                sc = new ServerConnect(socket);
-                connect = true;
-                set_enable_connect(true);
-                jButtonConnect.setText("Disconnect");
-            } catch (UnknownHostException e) {
-                addtolog(" SYSTEM>>>Unknow host");
-                setConnectButtonText(jRadioButtonServer.isSelected());
-                set_enable_connect(false);
-            } catch (IOException e) {
-                addtolog(" SYSTEM>>>IO Connect error");
-                setConnectButtonText(jRadioButtonServer.isSelected());
-                set_enable_connect(false);
-            }
-        }
-    }
-
-    public void game_disconnect() {
-        set_enable_connect(false);
-        set_enable_server(false);
-        timerWhitePause = true;
-        timerBlackPause = true;
-        jLabelBlackTime.setBackground(Configframe.getInstance().getColorBoardWhite());
-        jLabelWhiteTime.setBackground(Configframe.getInstance().getColorBoardWhite());
-        jButtonConnect.setText("Connect");
-        connect = false;
-        try {
-            pole_panel.game_start = false;
-            sc.client.shutdownInput();
-            sc.client.shutdownOutput();
-            sc.writer.out.close();
-            sc.writer.out.close();
-            sc.client.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     private void jButtonColorsSettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonColorsSettingsActionPerformed
         Configframe.getInstance().setVisible(true);
@@ -439,68 +361,43 @@ public class NetCheckers extends javax.swing.JFrame {
 
     private void jButtonSendMessageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSendMessageActionPerformed
         if (!jTextFieldMassage.getText().isEmpty()) {
-            sc.send_mess("mess " + jTextFieldMassage.getText());
-            addtolog(" I SAY>>> " + jTextFieldMassage.getText());
+            serverConnect.sendMessage("mess " + jTextFieldMassage.getText());
+            addToLog(" I>>> " + jTextFieldMassage.getText());
         }
-
     }//GEN-LAST:event_jButtonSendMessageActionPerformed
 
     private void jButtonNewGameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonNewGameActionPerformed
-        new_game_start();
+        startNewGame();
     }//GEN-LAST:event_jButtonNewGameActionPerformed
 
     private void jRadioButtonServerMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jRadioButtonServerMouseClicked
         jLabelIPLabel.setEnabled(!jRadioButtonServer.isSelected());
         jTextFieldIP.setEnabled(!jRadioButtonServer.isSelected());
-        if (jRadioButtonServer.isSelected()) jButtonConnect.setText("Start server");
-        else jButtonConnect.setText("Connect to server");
+        if (jRadioButtonServer.isSelected()) {
+            jButtonConnect.setText("Start server");
+        } else {
+            jButtonConnect.setText("Connect to server");
+        }
     }//GEN-LAST:event_jRadioButtonServerMouseClicked
 
     private void jRadioButtonClientMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jRadioButtonClientMouseClicked
         jLabelIPLabel.setEnabled(jRadioButtonClient.isSelected());
         jTextFieldIP.setEnabled(jRadioButtonClient.isSelected());
-        if (!jRadioButtonClient.isSelected()) jButtonConnect.setText("Start server");
-        else jButtonConnect.setText("Connect to server");
+        if (!jRadioButtonClient.isSelected()) {
+            jButtonConnect.setText("Start server");
+        } else {
+            jButtonConnect.setText("Connect to server");
+        }
     }//GEN-LAST:event_jRadioButtonClientMouseClicked
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         Configframe.getInstance().saveConfig();
     }//GEN-LAST:event_formWindowClosing
 
-    public void new_game_start() {
-        CheckersBoard.getInstance().initBoard();
-        if (jComboBoxSideSelect.getSelectedItem().toString().equals("Server - BLACK")) {
-            jCheckBoxRotateBoard.setSelected(true);
-            CheckersBoard.getInstance().myColor = CheckersBoard.BLACK;
-            sc.send_mess("newgame WHITE");
-            jLabel1.setText("You play BLACK");
-            CheckersBoard.getInstance().nowMove = CheckersBoard.WHITE;
-        } else {
-            jCheckBoxRotateBoard.setSelected(false);
-            CheckersBoard.getInstance().myColor = CheckersBoard.WHITE;
-            sc.send_mess("newgame BLACK");
-            jLabel1.setText("You play WHITE");
-            CheckersBoard.getInstance().nowMove = CheckersBoard.WHITE;
-        }
-        jLabelWhiteTime.setText(" WHITE: 0:00:00");
-        jLabelBlackTime.setText(" BLACK: 0:00:00");
-        timerWhitePause = true;
-        timerBlackPause = true;
-        timerBlackTime = 0;
-        timerWhiteTime = 0;
-        setWhiteMove(CheckersBoard.getInstance().nowMove == CheckersBoard.WHITE);
-        listModel.clear();
-        addtolog(" SYSTEM>>>New game started, " + jLabel1.getText());
-        pole_panel.newline = true;
-        pole_panel.game_start = true;
-        pole_panel.repaint();
-
-    }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JButton jButtonColorsSettings;
-    public javax.swing.JButton jButtonConnect;
+    private javax.swing.JButton jButtonConnect;
     private javax.swing.JButton jButtonNewGame;
     private javax.swing.JButton jButtonSendMessage;
     public javax.swing.JCheckBox jCheckBoxRotateBoard;
@@ -529,65 +426,94 @@ public class NetCheckers extends javax.swing.JFrame {
     private javax.swing.JTextField jTextFieldPort;
     // End of variables declaration//GEN-END:variables
 
-    public void addtolog(String s) {
+    public void connect() {
+        if (isServer()) {
+            ServerListiner.getInstance().start();
+            addToLog(" SYSTEM>>>Wait client connected ... ");
+        } else {
+            String ip = getIP();
+            int port = getPort();
+            addToLog(" SYSTEM>>>Connect to " + ip);
+            try {
+                Socket socket = new Socket(ip, port);
+                serverConnect = new ServerConnect(socket);
+                connect = true;
+                setEnableConnection(true);
+                jButtonConnect.setText("Disconnect");
+            } catch (UnknownHostException e) {
+                addToLog(" SYSTEM>>>Unknow host");
+                setConnectButtonText(jRadioButtonServer.isSelected(),false);
+                setEnableConnection(false);
+            } catch (IOException e) {
+                addToLog(" SYSTEM>>>IO Connect error");
+                setConnectButtonText(jRadioButtonServer.isSelected(),false);
+                setEnableConnection(false);
+            }
+        }
+    }
+    
+    public void startNewGame() {
+        checkersBoardPanel.initBoard();
+        if (jComboBoxSideSelect.getSelectedItem().toString().equals("Server - BLACK")) {
+            jCheckBoxRotateBoard.setSelected(true);
+            checkersBoardPanel.myColor = CheckersBoardPanel.BLACK;
+            serverConnect.sendMessage("newgame WHITE");
+            jLabel1.setText("You play BLACK");
+            checkersBoardPanel.nowMove = CheckersBoardPanel.WHITE;
+        } else {
+            jCheckBoxRotateBoard.setSelected(false);
+            checkersBoardPanel.myColor = CheckersBoardPanel.WHITE;
+            serverConnect.sendMessage("newgame BLACK");
+            jLabel1.setText("You play WHITE");
+            checkersBoardPanel.nowMove = CheckersBoardPanel.WHITE;
+        }
+        jLabelWhiteTime.setText(" WHITE: 0:00:00");
+        jLabelBlackTime.setText(" BLACK: 0:00:00");
+        timerWhitePause = true;
+        timerBlackPause = true;
+        timerBlackTime = 0;
+        timerWhiteTime = 0;
+        setWhiteMove(checkersBoardPanel.nowMove == CheckersBoardPanel.WHITE);
+        listModel.clear();
+        addToLog(" SYSTEM>>>New game started, " + jLabel1.getText());
+        checkersBoardPanel.newline = true;
+        checkersBoardPanel.game_start = true;
+        checkersBoardPanel.repaint();
+    }   
+
+    public void disconnect() {
+        setEnableConnection(false);
+        setEnableServer(false);
+        timerWhitePause = true;
+        timerBlackPause = true;
+        jLabelBlackTime.setBackground(Configframe.getInstance().getColorBoardWhite());
+        jLabelWhiteTime.setBackground(Configframe.getInstance().getColorBoardWhite());
+        setConnectButtonText(jRadioButtonServer.isSelected(), false);
+        connect = false;
+        try {
+            checkersBoardPanel.game_start = false;
+            serverConnect.closeServerConnection();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }    
+    
+    public void addToLog(String s) {
         jTextAreaLog.setText(jTextAreaLog.getText() + s + '\n');
         jTextFieldMassage.setText("");
         jScrollPane2.getVerticalScrollBar().setValue(jScrollPane2.getVerticalScrollBar().getMaximum());
     }
 
-    public void set_enable_connect(boolean b) {
+    public void setEnableConnection(boolean b) {
         jButtonSendMessage.setEnabled(b);
         jTextFieldMassage.setEnabled(b);
     }
 
-    public void set_enable_server(boolean b) {
+    public void setEnableServer(boolean b) {
         jComboBoxSideSelect.setEnabled(b);
-        //jButton3.setEnabled(b);
         jButtonNewGame.setEnabled(b);
         jButtonSendMessage.setEnabled(b);
         jTextFieldMassage.setEnabled(b);
-    }
-
-    private BoardPanel getPole_panel() {
-        if (pole_panel == null) {
-            pole_panel = new BoardPanel();
-            pole_panel.addMouseListener(new java.awt.event.MouseAdapter() {
-                public void mouseReleased(java.awt.event.MouseEvent e) {
-                    pole_panel.movestop();
-                }
-
-                public void mousePressed(java.awt.event.MouseEvent e) {
-                    pole_panel.x_move = e.getX();
-                    pole_panel.y_move = e.getY();
-                    pole_panel.movestart();
-                }
-            });
-            pole_panel.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-                public void mouseDragged(java.awt.event.MouseEvent e) {
-                    pole_panel.x_move = e.getX();
-                    pole_panel.y_move = e.getY();
-                    pole_panel.repaint();
-                }
-            });
-            pole_panel.addComponentListener(new java.awt.event.ComponentAdapter() {
-                public void componentResized(java.awt.event.ComponentEvent e) {
-                    pole_panel.resizePanel();
-                    pole_panel.repaint();
-                }
-            });
-        }
-        return pole_panel;
-    }
-
-    public void set_time(int h, int m, int s, String how) {
-        String mm = (Integer.toString(m).length() == 1) ? "0" + Integer.toString(m) : Integer.toString(m);
-        String ss = (Integer.toString(s).length() == 1) ? "0" + Integer.toString(s) : Integer.toString(s);
-        String time = "" + h + ":" + mm + ":" + ss;
-        if (how.equals("WHITE")) {
-            jLabelWhiteTime.setText(" WHITE: " + time);
-        } else {
-            jLabelBlackTime.setText(" BLACK: " + time);
-        }
     }
 
     public void setBackgroundColor(Color c) {
@@ -600,8 +526,8 @@ public class NetCheckers extends javax.swing.JFrame {
         jLabelBlackTime.setBackground(c);
     }
 
-    public void setWhiteMove(boolean b) {
-        if (b) {
+    public void setWhiteMove(boolean whiteMove) {
+        if (whiteMove) {
             jLabelBlackTime.setBackground(Configframe.getInstance().getColorBoardWhite());
             jLabelWhiteTime.setBackground(new Color(255, 0, 0));
             timerWhitePause = false;
@@ -612,13 +538,13 @@ public class NetCheckers extends javax.swing.JFrame {
             timerWhitePause = true;
             timerBlackPause = false;
         }
-        int isGameEnd = CheckersBoard.getInstance().isGameEnd();
-        if (isGameEnd == CheckersBoard.WHITE) {
-            addtolog("WHITE WIN!!!");
-            pole_panel.game_start = false;
-        }else if (isGameEnd == CheckersBoard.BLACK) {
-            addtolog("BLACK WIN!!!");
-            pole_panel.game_start = false;
+        int isGameEnd = checkersBoardPanel.isGameEnd();
+        if (isGameEnd == CheckersBoardPanel.WHITE) {
+            addToLog("WHITE WIN!!!");
+            checkersBoardPanel.game_start = false;
+        } else if (isGameEnd == CheckersBoardPanel.BLACK) {
+            addToLog("BLACK WIN!!!");
+            checkersBoardPanel.game_start = false;
         }
     }
 
@@ -663,14 +589,16 @@ public class NetCheckers extends javax.swing.JFrame {
         } else {
             jRadioButtonClient.setSelected(true);
         }
-        setConnectButtonText(server);
+        setConnectButtonText(server,false);
         jLabelIPLabel.setEnabled(!server);
         jTextFieldIP.setEnabled(!server);
     }
-    
-    public void setConnectButtonText(boolean server){
-        if (server) {
-            jButtonConnect.setText("Start server"); 
+
+    public void setConnectButtonText(boolean server, boolean disconnect) {
+        if (disconnect){
+            jButtonConnect.setText("Disconnect");
+        }else if (server) {
+            jButtonConnect.setText("Start server");
         } else {
             jButtonConnect.setText("Connect to server");
         }
@@ -682,6 +610,86 @@ public class NetCheckers extends javax.swing.JFrame {
 
     public void setPort(int port) {
         jTextFieldPort.setText(Integer.toString(port));
+    }
+    
+    public void parse(String mess) {
+        if (mess.isEmpty()) {
+            System.out.println("parse null");
+            return;
+        }
+        System.out.print("read " + mess + '\n');
+        String otvet = "";
+        String command = "";
+        StringTokenizer st = new StringTokenizer(mess, " ");
+        if (st.hasMoreElements()) {
+            command = st.nextToken().trim();
+        } else {
+            return;
+        }
+        if (command.equals("mess")) {
+            addToLog(" OPPONENT>>> " + mess.substring(5));
+        } else if (command.equals("newgame")) {
+            checkersBoardPanel.initBoard();
+            timerWhitePause = true;
+            timerBlackPause = true;
+            if (st.hasMoreTokens()) {
+                if (st.nextToken().equals("WHITE")) {
+                    checkersBoardPanel.myColor = CheckersBoardPanel.WHITE;
+                    jCheckBoxRotateBoard.setSelected(false);
+                    jLabel1.setText("You play WHITE");
+                    checkersBoardPanel.nowMove = CheckersBoardPanel.WHITE;
+                } else {
+                    checkersBoardPanel.myColor = CheckersBoardPanel.BLACK;
+                    jCheckBoxRotateBoard.setSelected(true);
+                    jLabel1.setText("You play BLACK");
+                    checkersBoardPanel.nowMove = CheckersBoardPanel.WHITE;
+                }
+            }
+            addToLog(" SYSTEM>>>New game started, " + jLabel1.getText());
+            jLabelWhiteTime.setText(" WHITE: 0:00:00");
+            jLabelBlackTime.setText(" BLACK: 0:00:00");
+            setWhiteMove(checkersBoardPanel.nowMove == CheckersBoardPanel.WHITE);
+            listModel.clear();
+            checkersBoardPanel.game_start = true;
+            checkersBoardPanel.newline = true;
+            checkersBoardPanel.repaint();
+        } else if (command.equals("move")) {
+            int i_where = Integer.parseInt(st.nextToken());
+            int j_where = Integer.parseInt(st.nextToken());
+            int i_end = Integer.parseInt(st.nextToken());
+            int j_end = Integer.parseInt(st.nextToken());
+            checkersBoardPanel.board[j_end][i_end] = checkersBoardPanel.board[j_where][i_where];
+            checkersBoardPanel.board[j_where][i_where] = 0;
+            checkersBoardPanel.nowMove = (checkersBoardPanel.nowMove == CheckersBoardPanel.WHITE) ? CheckersBoardPanel.BLACK : CheckersBoardPanel.WHITE;
+            setWhiteMove(checkersBoardPanel.nowMove == CheckersBoardPanel.WHITE);
+            checkersBoardPanel.addToMoveHisotry(i_where, j_where, i_end, j_end, "");
+            checkersBoardPanel.checkKings();
+            checkersBoardPanel.repaint();
+        } else if (command.equals("eat")) {
+            int i_where = Integer.parseInt(st.nextToken());
+            int j_where = Integer.parseInt(st.nextToken());
+            int i_end = Integer.parseInt(st.nextToken());
+            int j_end = Integer.parseInt(st.nextToken());
+            checkersBoardPanel.board[j_end][i_end] = checkersBoardPanel.board[j_where][i_where];
+            checkersBoardPanel.board[j_where][i_where] = 0;
+            checkersBoardPanel.board[j_where + (j_end - j_where) / 2][i_where + (i_end - i_where) / 2] = 0;
+            checkersBoardPanel.checkKings();
+            checkersBoardPanel.repaint();
+        } else if (command.equals("eatend")) {
+            checkersBoardPanel.nowMove = (checkersBoardPanel.nowMove == CheckersBoardPanel.WHITE) ? CheckersBoardPanel.BLACK : CheckersBoardPanel.WHITE;
+            setWhiteMove(checkersBoardPanel.nowMove == CheckersBoardPanel.WHITE);
+            checkersBoardPanel.addToMoveHisotry(0, 0, 0, 0, st.nextToken());
+        }
+        if (!otvet.isEmpty()) {
+            serverConnect.sendMessage(otvet);
+            int i_where = Integer.parseInt(st.nextToken());
+            int j_where = Integer.parseInt(st.nextToken());
+            int i_end = Integer.parseInt(st.nextToken());
+            int j_end = Integer.parseInt(st.nextToken());
+            checkersBoardPanel.board[j_end][i_end] = getInstance().checkersBoardPanel.board[j_where][i_where];
+            checkersBoardPanel.board[j_where][i_where] = 0;
+            checkersBoardPanel.repaint();
+        }
     }
 
 }

@@ -69,11 +69,11 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="1" attributes="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jPanelMenu" pref="408" max="32767" attributes="1"/>
-                      <Component id="jPanelBoard" pref="408" max="32767" attributes="3"/>
+                      <Component id="jPanelMenu" pref="402" max="32767" attributes="1"/>
+                      <Component id="jPanelBoard" max="32767" attributes="3"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jPanelLog" min="-2" pref="98" max="-2" attributes="0"/>
+                  <Component id="jPanelLog" min="-2" pref="109" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -109,7 +109,7 @@
               </Events>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-                  <AbsoluteConstraints x="540" y="70" width="70" height="20"/>
+                  <AbsoluteConstraints x="540" y="80" width="70" height="20"/>
                 </Constraint>
               </Constraints>
             </Component>
@@ -119,7 +119,7 @@
               </Properties>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-                  <AbsoluteConstraints x="70" y="70" width="460" height="20"/>
+                  <AbsoluteConstraints x="70" y="80" width="460" height="20"/>
                 </Constraint>
               </Constraints>
             </Component>
@@ -130,7 +130,7 @@
               </AuxValues>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-                  <AbsoluteConstraints x="70" y="6" width="540" height="60"/>
+                  <AbsoluteConstraints x="70" y="5" width="540" height="70"/>
                 </Constraint>
               </Constraints>
 
@@ -151,7 +151,7 @@
               </Properties>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-                  <AbsoluteConstraints x="10" y="70" width="60" height="20"/>
+                  <AbsoluteConstraints x="10" y="80" width="60" height="20"/>
                 </Constraint>
               </Constraints>
             </Component>
@@ -194,7 +194,7 @@
               </AuxValues>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-                  <AbsoluteConstraints x="0" y="380" width="80" height="-1"/>
+                  <AbsoluteConstraints x="0" y="375" width="80" height="-1"/>
                 </Constraint>
               </Constraints>
             </Component>
@@ -207,7 +207,7 @@
               </Events>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-                  <AbsoluteConstraints x="90" y="380" width="90" height="-1"/>
+                  <AbsoluteConstraints x="90" y="375" width="90" height="-1"/>
                 </Constraint>
               </Constraints>
             </Component>
@@ -447,9 +447,6 @@
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonConnectActionPerformed"/>
                   </Events>
-                  <AuxValues>
-                    <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>
-                  </AuxValues>
                   <Constraints>
                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
                       <AbsoluteConstraints x="10" y="100" width="160" height="22"/>

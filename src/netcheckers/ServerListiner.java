@@ -5,29 +5,29 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class ServerListiner extends Thread {
+    private static ServerListiner instance;
+    private ServerSocket ss;
 
-    static ServerListiner instance;
-    int port;
-
-    private boolean work = true;
-    public ServerSocket ss;
-
-    public ServerListiner() {
-        instance = this;
+    public static ServerListiner getInstance() {
+        if (instance == null) {
+            instance = new ServerListiner();
+        }
+        return instance;
+    }
+    
+    private ServerListiner() {
     }
 
     public void run() {
-        port = NetCheckers.getInstance().getPort();
         try {
-            ss = new ServerSocket(port);
-            NetCheckers.getInstance().jButtonConnect.setText("Disconnect");
+            ss = new ServerSocket(NetCheckers.getInstance().getPort());
+            NetCheckers.getInstance().setConnectButtonText(false,true);
             Socket client = ss.accept();
-            NetCheckers.getInstance().addtolog(" SYSTEM>>>Client connect: " + client.toString());
-            NetCheckers.getInstance().addtolog(" SYSTEM>>>Press new game button to start new game");
-            NetCheckers.getInstance().set_enable_connect(true);
-            NetCheckers.getInstance().set_enable_server(true);
-            ServerConnect sc = new ServerConnect(client);
-            NetCheckers.getInstance().sc = sc;
+            NetCheckers.getInstance().addToLog(" SYSTEM>>>Client connect: " + client.toString());
+            NetCheckers.getInstance().addToLog(" SYSTEM>>>Press new game button to start new game");
+            NetCheckers.getInstance().setEnableConnection(true);
+            NetCheckers.getInstance().setEnableServer(true);
+            NetCheckers.getInstance().serverConnect = new ServerConnect(client);
             NetCheckers.getInstance().connect = true;
             ss.close();
         } catch (IOException e) {

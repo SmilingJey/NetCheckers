@@ -1,36 +1,43 @@
 package netcheckers;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.Socket;
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- *
- * @author APTEM
- */
 public class ServerConnect {
-    public boolean accept=false;
-    public boolean active=false;
+
+    public boolean accept = false;
+    public boolean active = false;
     public String info;
-    Socket client;
+    Socket socket;
     Writer writer;
     Reader reader;
-    public boolean stop=false;
+    public boolean stop = false;
 
-    public ServerConnect(Socket client) {
+    public ServerConnect(Socket socket) {
         super();
-        this.client=client;
-        writer=new Writer(this);
-        reader=new Reader(this);
-        writer.start();
-        reader.start();
+        this.socket = socket;
+        try {
+            writer = new Writer(new PrintWriter(new OutputStreamWriter(socket.getOutputStream()), true));
+            reader = new Reader(new BufferedReader(new InputStreamReader(socket.getInputStream())));
+            writer.start();
+            reader.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void send_mess(String mess){
-    	writer.mess=mess+'\n';
-    	writer.notify_this();
+    public void sendMessage(String message) {
+        writer.sendMessage(message + '\n');
+    }
+
+    public void closeServerConnection() throws IOException {
+        socket.shutdownInput();
+        socket.shutdownOutput();
+        writer.closeWriter();
+        socket.close();
     }
 }
