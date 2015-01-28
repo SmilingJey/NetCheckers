@@ -26,11 +26,13 @@ public class ServerListiner extends Thread {
             NetCheckers.getInstance().setEnableServer(true);
             NetCheckers.getInstance().serverConnect = new ServerConnect(client);
             NetCheckers.getInstance().connect = true;
-            
             serverSocket.close();
+            sleep(500);
             NetCheckers.getInstance().startNewGame();
             
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }

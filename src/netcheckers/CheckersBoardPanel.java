@@ -1,6 +1,7 @@
 package netcheckers;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -29,7 +30,7 @@ public class CheckersBoardPanel extends JPanel {
     public boolean newline = true;
     public String eat_hod = "";
     public boolean alr_eat = false;
-    public boolean game_start = false;
+    public boolean gameStart = false;
     public static final int WHITE = 1;
     public static final int WHITE_KING = 2;
     public static final int BLACK = 3;
@@ -39,6 +40,8 @@ public class CheckersBoardPanel extends JPanel {
     public int[][] board = new int[BOARD_SIZE][BOARD_SIZE];
     public boolean mustEat = false;
     public String mustEatString = "";
+    public boolean gameEnd = false;
+    public String gameEndWin = "WHITE WIN";
 
     public CheckersBoardPanel() {
         super();
@@ -81,6 +84,7 @@ public class CheckersBoardPanel extends JPanel {
         drawBoard(buffer_g);
         drawCheckers(buffer_g);
         drawMove(buffer_g);
+        drawEndGame(buffer_g);
         g.drawImage(bufferImage, 0, 0, null);
     }
 
@@ -276,10 +280,22 @@ public class CheckersBoardPanel extends JPanel {
             }
         }
     }
+    
+    public void drawEndGame(Graphics2D g) {
+        if (gameEnd){
+            Font f = g.getFont();
+            g.setColor(Color.RED);
+            g.setFont(new Font("Verdana", Font.PLAIN, 60));
+            g.drawString(gameEndWin, this.getWidth() / 2 - 190, this.getHeight() / 2 + 20);       
+            g.setFont(f);
+        }
+    }
 
     public void moveStart() {
-        if (!game_start) {
-            NetCheckers.getInstance().addToLog(" SYSTEM>>>You can not do move, game not started. Press new game button");
+        if (!gameStart) {
+            NetCheckers.getInstance().addToLog(" SYSTEM>>>Game has not started");
+            NetCheckers.getInstance().addToLog(" SYSTEM>>>You must start server and wait for the client connection "); 
+            NetCheckers.getInstance().addToLog("or connect to the server"); 
             return;
         }
         if (myColor != nowMove) {
@@ -320,8 +336,8 @@ public class CheckersBoardPanel extends JPanel {
             if (mustEat) {
                 String h = Integer.toString(j_where) + Integer.toString(i_where) + "-"
                         + Integer.toString(j_end) + Integer.toString(i_end);
-                System.out.println("move" + h);
-                System.out.println("eat" + mustEatString);
+                System.out.println("move " + h);
+                System.out.println("eat " + mustEatString);
                 StringTokenizer st = new StringTokenizer(mustEatString, ";");
                 boolean dh = false;
                 while (st.hasMoreTokens()) {
@@ -329,10 +345,8 @@ public class CheckersBoardPanel extends JPanel {
                     if (s.equals(h)) {
                         board[j_end][i_end] = now_hodit;
                         board[j_where + (j_end - j_where) / 2][i_where + (i_end - i_where) / 2] = 0;
-                        send = ("eat "
-                                + Integer.toString(i_where) + " " + Integer.toString(j_where) + " "
+                        send = ("eat " + Integer.toString(i_where) + " " + Integer.toString(j_where) + " "
                                 + Integer.toString(i_end) + " " + Integer.toString(j_end));
-
                         if (alr_eat) {
                             eat_hod = eat_hod + "-"
                                     + abc_l[i_end] + Integer.toString(j_end + 1);
@@ -380,6 +394,9 @@ public class CheckersBoardPanel extends JPanel {
             }
         }
         move = false;
+        
+        if (!move && mustEat) NetCheckers.getInstance().addToLog(" SYSTEM>>>You mast eat opponents checker!");
+        
         repaint();
     }
 
@@ -412,7 +429,7 @@ public class CheckersBoardPanel extends JPanel {
             newline = false;
         } else {
             NetCheckers.getInstance().listModel.setElementAt(
-                    NetCheckers.getInstance().listModel.lastElement() + "                 " + s,
+                    NetCheckers.getInstance().listModel.lastElement() + "      " + s,
                     NetCheckers.getInstance().listModel.getSize() - 1);
             newline = true;
         }

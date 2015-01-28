@@ -168,7 +168,7 @@ public class NetCheckers extends javax.swing.JFrame {
 
         jTextFieldMessage.setEnabled(false);
         jPanelLog.add(jTextFieldMessage);
-        jTextFieldMessage.setBounds(70, 80, 460, 20);
+        jTextFieldMessage.setBounds(90, 80, 440, 20);
 
         jTextAreaLog.setEditable(false);
         jTextAreaLog.setColumns(20);
@@ -176,15 +176,15 @@ public class NetCheckers extends javax.swing.JFrame {
         jScrollPane2.setViewportView(jTextAreaLog);
 
         jPanelLog.add(jScrollPane2);
-        jScrollPane2.setBounds(70, 5, 540, 70);
+        jScrollPane2.setBounds(90, 5, 520, 70);
 
         jLabel6.setText("Message:");
         jPanelLog.add(jLabel6);
-        jLabel6.setBounds(10, 80, 60, 20);
+        jLabel6.setBounds(10, 80, 80, 20);
 
         jLabel2.setText("Log:");
         jPanelLog.add(jLabel2);
-        jLabel2.setBounds(10, 10, 60, 14);
+        jLabel2.setBounds(10, 4, 80, 20);
 
         jPanelMenu.setBackground(new java.awt.Color(204, 153, 0));
         jPanelMenu.setPreferredSize(new java.awt.Dimension(100, 274));
@@ -211,6 +211,7 @@ public class NetCheckers extends javax.swing.JFrame {
 
         jScrollPane1.setAutoscrolls(true);
 
+        jListMove.setFont(new java.awt.Font("Consolas", 0, 14)); // NOI18N
         jScrollPane1.setViewportView(jListMove);
 
         jPanelMenu.add(jScrollPane1);
@@ -286,17 +287,17 @@ public class NetCheckers extends javax.swing.JFrame {
         jTextFieldIP.setText("127.0.0.1");
         jTextFieldIP.setEnabled(false);
         jPanelNetSettings.add(jTextFieldIP);
-        jTextFieldIP.setBounds(70, 40, 100, 20);
+        jTextFieldIP.setBounds(80, 40, 90, 20);
 
         jTextFieldPort.setText("4567");
         jTextFieldPort.setToolTipText("");
         jPanelNetSettings.add(jTextFieldPort);
-        jTextFieldPort.setBounds(70, 70, 100, 20);
+        jTextFieldPort.setBounds(80, 70, 90, 20);
 
         jLabelIPLabel.setText("Server IP:");
         jLabelIPLabel.setEnabled(false);
         jPanelNetSettings.add(jLabelIPLabel);
-        jLabelIPLabel.setBounds(10, 40, 60, 20);
+        jLabelIPLabel.setBounds(10, 40, 70, 20);
 
         jLabel5.setText("Port:");
         jPanelNetSettings.add(jLabel5);
@@ -487,7 +488,8 @@ public class NetCheckers extends javax.swing.JFrame {
         listModel.clear();
         addToLog(" SYSTEM>>>New game started, " + jLabel1.getText());
         checkersBoardPanel.newline = true;
-        checkersBoardPanel.game_start = true;
+        checkersBoardPanel.gameStart = true;
+        checkersBoardPanel.gameEnd = false;
         checkersBoardPanel.repaint();
     }   
 
@@ -501,7 +503,7 @@ public class NetCheckers extends javax.swing.JFrame {
         setConnectButtonText(jRadioButtonServer.isSelected(), false);
         connect = false;
         try {
-            checkersBoardPanel.game_start = false;
+            checkersBoardPanel.gameStart = false;
             if (serverConnect!=null || connect) serverConnect.closeServerConnection();
             if (serverListener!=null) serverListener.closeServerListener();
         } catch (IOException e) {
@@ -555,10 +557,16 @@ public class NetCheckers extends javax.swing.JFrame {
         int isGameEnd = checkersBoardPanel.isGameEnd();
         if (isGameEnd == CheckersBoardPanel.WHITE) {
             addToLog("WHITE WIN!!!");
-            checkersBoardPanel.game_start = false;
+            checkersBoardPanel.gameEnd = true;
+            checkersBoardPanel.gameEndWin = "WHITE WIN";
+            checkersBoardPanel.gameStart = false;
+            checkersBoardPanel.repaint();
         } else if (isGameEnd == CheckersBoardPanel.BLACK) {
             addToLog("BLACK WIN!!!");
-            checkersBoardPanel.game_start = false;
+            checkersBoardPanel.gameEnd = true;
+            checkersBoardPanel.gameEndWin = "BLACK WIN";
+            checkersBoardPanel.gameStart = false;
+            checkersBoardPanel.repaint();
         }
     }
 
@@ -646,6 +654,9 @@ public class NetCheckers extends javax.swing.JFrame {
             checkersBoardPanel.initBoard();
             timerWhitePause = true;
             timerBlackPause = true;
+            timerBlackTime = 0;
+            timerWhiteTime = 0;
+            checkersBoardPanel.gameEnd = false;
             if (st.hasMoreTokens()) {
                 if (st.nextToken().equals("WHITE")) {
                     checkersBoardPanel.myColor = CheckersBoardPanel.WHITE;
@@ -664,7 +675,7 @@ public class NetCheckers extends javax.swing.JFrame {
             jLabelBlackTime.setText(" BLACK: 0:00");
             setWhiteMove(checkersBoardPanel.nowMove == CheckersBoardPanel.WHITE);
             listModel.clear();
-            checkersBoardPanel.game_start = true;
+            checkersBoardPanel.gameStart = true;
             checkersBoardPanel.newline = true;
             checkersBoardPanel.repaint();
         } else if (command.equals("move")) {
