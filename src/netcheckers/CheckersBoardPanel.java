@@ -12,7 +12,6 @@ public class CheckersBoardPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
     private BufferedImage bufferImage;
-    private BufferedImage temp_bufferImage;
     private Graphics2D buffer_g;
     private static final int BOARD_SIZE = 8;
     private int cellSize = 20;
