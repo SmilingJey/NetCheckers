@@ -438,7 +438,7 @@ public class NetCheckers extends javax.swing.JFrame {
         if (isServer()) {
             serverListener = new ServerListiner();
             serverListener.start();
-            addToLog(" SYSTEM>>>Wait client connected ... ");
+            addToLog(" SYSTEM>>>Wait client connection ... ");
         } else {
             String ip = getIP();
             int port = getPort();

@@ -394,7 +394,7 @@ public class CheckersBoardPanel extends JPanel {
         }
         move = false;
         
-        if (!move && mustEat) NetCheckers.getInstance().addToLog(" SYSTEM>>>You mast eat opponents checker!");
+        if (!move && mustEat) NetCheckers.getInstance().addToLog(" SYSTEM>>>You must eat opponents checker!");
         
         repaint();
     }
