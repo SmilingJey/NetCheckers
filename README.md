@@ -1,5 +1,5 @@
 NetCheckers
 ======
-Play russian checkers on the net
+Play russian checkers with your friends
 
 ![](image/screen.jpg)
